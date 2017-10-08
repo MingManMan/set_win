@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "set_win", "set_win\set_win.csproj", "{E24EA56D-65A0-4AC9-84CE-550311349EC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "set_win_v1", "set_win_v1\set_win_v1.csproj", "{62DE165E-A3BA-4531-AE67-4415F0816661}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E24EA56D-65A0-4AC9-84CE-550311349EC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E24EA56D-65A0-4AC9-84CE-550311349EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E24EA56D-65A0-4AC9-84CE-550311349EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E24EA56D-65A0-4AC9-84CE-550311349EC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62DE165E-A3BA-4531-AE67-4415F0816661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62DE165E-A3BA-4531-AE67-4415F0816661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62DE165E-A3BA-4531-AE67-4415F0816661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62DE165E-A3BA-4531-AE67-4415F0816661}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
