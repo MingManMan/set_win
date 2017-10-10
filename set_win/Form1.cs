@@ -182,6 +182,7 @@ namespace set_win
         }
 
         mousehook mouse = new mousehook();
+        //功能核心函数，重点关注
         void mouse_OnMouseActivity(object sender, MouseEventArgs e)
         {
             string str = "X:" + e.X + "  Y:" + e.Y;
@@ -534,5 +535,90 @@ namespace set_win
         {
 
         }
+
+        private void button18_Click(object sender, EventArgs e)
+        {
+            Rectangle ScreenArea = Screen.GetBounds(this);
+            listBox1.Items.Add("全屏宽" + ScreenArea.Width.ToString());
+            listBox1.Items.Add("全屏高" + ScreenArea.Height.ToString());
+
+            //不要工具栏的大小
+            string currentScreenSize_OutTaskBar = SystemInformation.WorkingArea.Width.ToString() + "," + SystemInformation.WorkingArea.Height.ToString();
+            listBox1.Items.Add("无工具栏宽" + SystemInformation.WorkingArea.Width.ToString());
+            listBox1.Items.Add("无工具栏高" + SystemInformation.WorkingArea.Height.ToString());
+
+
+        }
+
+        private void button19_Click(object sender, EventArgs e)
+        {
+            Graphics g = panel1.CreateGraphics();
+            //出现一个画笔
+            Pen pen = new Pen(Brushes.Red);
+            //因为创建矩形需要point对象与size对象
+            Point p = new Point(10, 10);
+            Size s = new Size(60, 60);
+            Rectangle r = new Rectangle(p, s);
+            g.DrawRectangle(pen, r);
+            //画线
+            Point p1 = new Point(20, 20);
+            Point p2 = new Point(20, 50);
+            g.DrawLine(new Pen(Color.Red, 1), p1, p2);
+
+            int w = panel1.Size.Width;
+            int h = panel1.Size.Height;
+
+            int sw = SystemInformation.WorkingArea.Width;
+            int sh = SystemInformation.WorkingArea.Height;
+            Double fw =  sw/w;  // 绘图区域/原始图
+            Double fh = sh/h;
+            Double n = 0;
+
+            textBox1.Text = "aaaaa:"+fw.ToString();
+            textBox2.Text = fh.ToString();
+
+            if (fw > fh)  //以小的为放缩比例进行处理。
+            {
+                n = fw;    
+            }
+            else
+            {
+                n = fh;
+            }
+            int nw =(int)(sw/n);
+            int nh = (int)(sh/n);
+            int grid_size = 10;
+            
+            textBox3.Text = n.ToString();
+
+            for(int i = 0; i <= nw; i = i + grid_size)
+            {
+                listBox1.Items.Add(p1.ToString());
+                p1 = new Point(i, 0);
+                p2 = new Point(i, nw);
+                listBox1.Items.Add(p1.ToString()+"   "+p2.ToString());
+
+                g.DrawLine(new Pen(Color.Red, 1), p1, p2);
+            }
+            for (int j = 0; j < nh; j = j + grid_size)
+            {
+                p1 = new Point(0, j);
+                p2 = new Point(nw, j);
+                g.DrawLine(new Pen(Color.Red, 1), p1, p2);
+            }
+        }
+
+        private void button20_Click(object sender, EventArgs e)
+        {
+            Panel p1 = new Panel();
+            p1.Location = new Point(10, 10);
+            p1.Size = new Size(20, 20);
+            p1.ForeColor = Color.Blue;
+            p1.BackColor = Color.Blue;
+            p1.Visible = true;
+            p1.AllowDrop = true;
+            panel1.Controls.Add(p1);
+        }
     }
 }
+
