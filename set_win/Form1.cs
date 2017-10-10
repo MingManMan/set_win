@@ -607,7 +607,7 @@ namespace set_win
                 g.DrawLine(new Pen(Color.Red, 1), p1, p2);
             }
         }
-
+        PickBox pickbox1 = new PickBox();
         private void button20_Click(object sender, EventArgs e)
         {
             Panel p1 = new Panel();
@@ -617,7 +617,32 @@ namespace set_win
             p1.BackColor = Color.Blue;
             p1.Visible = true;
             p1.AllowDrop = true;
+            p1.Name = "p1";
+            
             panel1.Controls.Add(p1);
+            p1.Click += new EventHandler(myclick);
+            p1.LostFocus+= new EventHandler(mylostfocus);
+
+            pickbox1.WireControl(p1);
+
+
+
+        }
+        private void mylostfocus(object sender, EventArgs e)
+        {
+            pickbox1.Remove();
+            textBox2.Text = "remove control";
+        }
+
+           private void myclick(object sender,EventArgs e)
+        {
+           
+           
+            Panel o = (Panel)sender;
+           
+            textBox1.Text += o.Name.ToString();
+           
+
         }
     }
 }
