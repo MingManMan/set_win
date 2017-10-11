@@ -472,7 +472,7 @@ namespace set_win
             }
             //添加根节点
             treeView1.Nodes.Add(txtNodeName.Text.Trim());
-            treeView1.Nodes.Add(txtNodeName.Text.Trim());
+            //treeView1.Nodes.Add(txtNodeName.Text.Trim());
             txtNodeName.Text = "";
         }
 
@@ -520,6 +520,7 @@ namespace set_win
                 if (CurrentNode is TreeNode)//判断你点的是不是一个节点
                 {
                     treeView1.SelectedNode = CurrentNode;
+                    
                 }
                 else
                 {
@@ -527,6 +528,15 @@ namespace set_win
                     添加roo节点ToolStripMenuItem.Enabled = false;
                     //treeView1.ContextMenuStrip = this.contextMenuStrip2;
                     //contextMenuStrip2.Show(MousePosition);
+                }
+            }else if (e.Button == MouseButtons.Left)
+            {
+                Point ClickPoint = new Point(e.X, e.Y);
+                
+                TreeNode CurrentNode = treeView1.GetNodeAt(ClickPoint);
+                if (CurrentNode is TreeNode)//判断你点的是不是一个节点
+                {
+                    listBox1.Items.Add(CurrentNode.Text);
                 }
             }
         }
@@ -643,6 +653,11 @@ namespace set_win
             textBox1.Text += o.Name.ToString();
            
 
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            treeView1.LabelEdit = true;
         }
     }
 }
