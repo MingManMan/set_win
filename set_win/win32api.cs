@@ -106,6 +106,32 @@ namespace set_win
 
     public class win32api
     {
+        ///改变窗口位置常量定义
+        ///
+        public const int HWND_BOTTOM = 1; //把窗口放在Z轴的最后，即所有窗口的后面
+        public const int HWND_TOP = 0; //将窗口放在Z轴的前面，即所有窗口的前面
+        public const int HWND_TOPMOST = -1; //使窗口成为“TopMost”类型的窗口，这种类型的窗口总是在其它窗口的前面，真到它被关闭
+        public const int HWND_NOTOPMOST = -2; //将窗口放在所有“TopMost”类型
+
+        public const int SWP_DRAWFRAME = 0x20;  //移动窗口后重画窗口及其上的所有内容
+        public const int SWP_HIDEWINDOW = 0x80;  //隐藏窗口，窗口隐藏后既不出现在屏幕上也不出现在任务栏上，但它仍然处于激活状态
+        public const int SWP_NOACTIVATE = 0x10;  //窗口移动后不激活窗口，当然，如果窗口在移动前就是激活的则例外
+        public const int SWP_NOCOPYBITS = 0x100;  //当窗口移动后，不重画它上面的任何内容
+        public const int SWP_NOMOVE = 0x2;  //不移动窗口（即忽略X和Y参数）
+        public const int SWP_NOSIZE = 0x1;  //不改变窗口尺寸（即忽略Cx和Cy参数）
+
+        //不重画改变的内容。如果设置了这个标志，则不发生任何重画动作。
+        //适用于客户区和非客户区（包括标题栏和滚动条）和任何由于窗回移动而露出的父窗口的所有部分。
+        //如果设置了这个标志，应用程序必须明确地使窗口无效并区重画窗口的任何部分和父窗口需要重画的部分。
+        public const int SWP_NOREDRAW = 0x8;
+
+        public const int SWP_NOZORDER = 0x4;  //不改变窗口听Z轴位置（即忽略hWndInsertAfter参数）
+        public const int SWP_SHOWWINDOW = 0x40;  //显示窗口（之前必须使用过SWP_HIDEWINDOW隐藏窗口）
+        public const int SWP_ASYNCWINDOWPOS = 0x4000; //若调用进程不拥有窗口, 系统会向拥有窗口的线程发出需求
+        public const int SWP_DEFERERASE = 0x2000; //{防止产生 WM_SYNCPAINT 消息}
+        public const int SWP_NOSENDCHANGING = 0x400; //{不发出 WM_WINDOWPOSCHANGING 消息 }
+
+
         /// <summary>
         /// 鼠标常量定义
         /// </summary>
@@ -211,6 +237,12 @@ namespace set_win
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern int MoveWindow(HWND hwnd, int x, int y, int nWidth, int nHeight, bool bRepaint);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int Width, int Height, int flags);
+      
+
+
+
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern UInt32 GetWindowThreadProcessId(HWND hwnd, ref uint lpdwProcessId);
 
@@ -262,6 +294,7 @@ namespace set_win
          */
         [DllImport("User32.DLL", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr LoadCursorFromFile(string fileName);
+
 
     }
 }
