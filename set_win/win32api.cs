@@ -88,6 +88,7 @@ namespace set_win
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [Serializable]
     public struct RECT
     {
         public int Left;                             //最左坐标

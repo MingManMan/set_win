@@ -127,8 +127,8 @@ namespace set_win
 
             if (win32api.IsWindowVisible(hWnd) && win32api.IsWindow(hWnd) && win32api.IsWindowEnabled(hWnd))
             {
-                StringBuilder strbTitle = new StringBuilder();
-                int nLength = win32api.GetWindowText(hWnd, strbTitle, strbTitle.Capacity + 1);
+                StringBuilder strbTitle = new StringBuilder(256);
+                int nLength = win32api.GetWindowText(hWnd, strbTitle, strbTitle.Capacity );
                 if (nLength > 1)
                 {
                     listBox1.Items.Add(strbTitle.ToString());

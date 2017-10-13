@@ -10,6 +10,7 @@ using HDC = System.IntPtr;
 using System.Drawing;
 
 namespace set_win
+
 {
     [Flags]
     public enum SnapshotFlags : uint
@@ -88,6 +89,7 @@ namespace set_win
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    [Serializable]
     public struct RECT
     {
         public int Left;                             //最左坐标

@@ -5,7 +5,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
-namespace set_win
+namespace  set_win
+
 {
     class mousehook
     {

@@ -297,25 +297,25 @@
             this.添加子节点ToolStripMenuItem,
             this.删除选中节点ToolStripMenuItem});
             this.contextMenuStrip2.Name = "contextMenuStrip2";
-            this.contextMenuStrip2.Size = new System.Drawing.Size(149, 70);
+            this.contextMenuStrip2.Size = new System.Drawing.Size(153, 92);
             // 
             // 添加roo节点ToolStripMenuItem
             // 
             this.添加roo节点ToolStripMenuItem.Name = "添加roo节点ToolStripMenuItem";
-            this.添加roo节点ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.添加roo节点ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.添加roo节点ToolStripMenuItem.Text = "添加roo节点";
             this.添加roo节点ToolStripMenuItem.Click += new System.EventHandler(this.添加roo节点ToolStripMenuItem_Click);
             // 
             // 添加子节点ToolStripMenuItem
             // 
             this.添加子节点ToolStripMenuItem.Name = "添加子节点ToolStripMenuItem";
-            this.添加子节点ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.添加子节点ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.添加子节点ToolStripMenuItem.Text = "添加子节点";
             // 
             // 删除选中节点ToolStripMenuItem
             // 
             this.删除选中节点ToolStripMenuItem.Name = "删除选中节点ToolStripMenuItem";
-            this.删除选中节点ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.删除选中节点ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.删除选中节点ToolStripMenuItem.Text = "删除选中节点";
             // 
             // button14
