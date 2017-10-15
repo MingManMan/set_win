@@ -133,6 +133,10 @@ namespace set_win
         public const int SWP_NOSENDCHANGING = 0x400; //{不发出 WM_WINDOWPOSCHANGING 消息 }
 
 
+        public const UInt32 SW_SHOWNORMAL = 1;
+
+
+
         /// <summary>
         /// 鼠标常量定义
         /// </summary>

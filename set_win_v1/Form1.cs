@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.Runtime.InteropServices;
@@ -16,6 +11,8 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Threading;
 using set_win;
+using System.Text;
+
 namespace set_win_v1
 {
     public partial class Form1 : Form
@@ -25,6 +22,7 @@ namespace set_win_v1
         {
             public string fullname = "";  //文件路径名
             public IntPtr wndhandle = new IntPtr(); //暂时用用得handle
+            public IntPtr pid = new IntPtr();  //对应进程PID
             public RECT rect = new RECT();   //位置记忆 
         }
 
@@ -50,9 +48,10 @@ namespace set_win_v1
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            
             if (button1.Text.Equals("记录窗口布局"))
             {
+                this.TopMost = true;
                 treeView1.ExpandAll();
                 //添加分组--获得分组数
                 int group_num = treeView1.GetNodeCount(false);
@@ -90,6 +89,7 @@ namespace set_win_v1
             //点击过程中，记录相关信息
 
             save_json_file(Application.StartupPath + "\\info.json");
+            this.TopMost = false;
         }
 
         private RECT get_window_rect(IntPtr whandle)
@@ -146,17 +146,21 @@ namespace set_win_v1
             {
                 formHandle = parent_handle;
                 parent_handle = win32api.GetParent(formHandle);
+                
             }
 
-            ////得到窗口的标题
-            //StringBuilder title = new StringBuilder(256);
-            //win32api.GetWindowText(formHandle, title, title.Capacity);
-
+          
             //鼠标左键点击
-            
+
             if (e.Button == MouseButtons.Left)
             {
-                
+
+                ////得到窗口的标题
+                StringBuilder title = new StringBuilder(256);
+                win32api.GetWindowText(formHandle, title, title.Capacity);
+                string aaa = string.Format("handlw:{0} title:{1}", formHandle, title);
+                treeView2.Nodes.Add(aaa);
+
                 //窗口信息获得
                 wininfo win_info = new wininfo();
                 win_info.rect = get_window_rect(formHandle);
@@ -180,10 +184,13 @@ namespace set_win_v1
                     uint num = 0;
                     win32api.GetWindowThreadProcessId(win_info.wndhandle, ref num);
                     win_info.fullname = get_fullpath(num);
+                    win_info.pid = (IntPtr)num;
                     win_group.win_info_list.Add(Clone<wininfo>(win_info));
                     fullpathname = win_info.fullname;
                     treeView1.SelectedNode = CurrentNode;
+                    string ddd = string.Format("{0},{1}", num, fullpathname);
                     treeView1.SelectedNode.Nodes.Add(fullpathname.Trim());
+                    //treeView1.SelectedNode.Nodes.Add(ddd);
                 }
 
             }
@@ -210,12 +217,10 @@ namespace set_win_v1
             }
         }
 
-        
-
         //获得所有的顶级窗口的全路径
-        public List<string> get_full_path_all()
+        public List<wininfo> get_top_win_info_way_1()
         {
-            List<string> path_list = new List<string>();
+            List<wininfo> path_list = new List<wininfo>();
 
             hWnd_list.Clear();
             WndEnumCallBack my_call_back = new WndEnumCallBack(my_call_back_function);
@@ -225,7 +230,30 @@ namespace set_win_v1
             {
                 uint num = 0;
                 win32api.GetWindowThreadProcessId(i, ref num);
-                path_list.Add(string.Format("IntPtr{0}---num{1}---{2}",i,num,get_fullpath(num)));
+                string a = string.Format("{0}",get_fullpath(num));
+                bool path_list_have_it = false;
+                foreach(wininfo j in path_list)
+                {
+                    if (j.fullname==a)
+                    {
+                        path_list_have_it = true;
+                        break;
+                    }
+
+                }
+               path_list_have_it = false;
+               if (!path_list_have_it)
+                {
+                    wininfo t = new wininfo();
+                    t.fullname = a;
+                    t.wndhandle = i;
+                    t.pid= (IntPtr)num;
+                    t.rect.Top = 0;
+                    t.rect.Bottom = 0;
+                    t.rect.Left = 0;
+                    t.rect.Right = 0;
+                    path_list.Add(t);
+                }
             }
             return path_list;
         }
@@ -237,18 +265,10 @@ namespace set_win_v1
         
         public bool my_call_back_function(IntPtr hWnd, IntPtr lParam)
         {
-            uint num = 0;
-            win32api.GetWindowThreadProcessId(hWnd, ref num);
-            if (num == 0)
+            if (win32api.IsWindowVisible(hWnd) && win32api.IsWindow(hWnd) && win32api.IsWindowEnabled(hWnd))
             {
                 hWnd_list.Add(hWnd);
-             
             }
-            
-            //if (win32api.IsWindowVisible(hWnd) && win32api.IsWindow(hWnd) && win32api.IsWindowEnabled(hWnd))
-            //{
-            //    hWnd_list.Add(hWnd);
-            //}
             return true;
         }
 
@@ -261,7 +281,6 @@ namespace set_win_v1
 
 
         //获取主窗口handle
-
         IntPtr the_mainWindHandle = IntPtr.Zero;  //用于获得主窗口的handle
         public bool find_main_window_handle(IntPtr hWnd, IntPtr lParam)
         {
@@ -275,10 +294,6 @@ namespace set_win_v1
             }
             return true;
         }
-
-
-
-
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -298,24 +313,54 @@ namespace set_win_v1
                     groupnode = treeView1.SelectedNode.Parent;
                 }
             }
+
+
+            //获得当前所有运行中程序的全路径名，以及对应的窗口句柄
+            treeView2.Nodes.Clear();
+            List<wininfo> path_list = new List<wininfo>();
+            path_list = get_top_win_info_way_2();
+            foreach (wininfo k in path_list)
+            {
+                string aaa = string.Format("pid:{0},winhandle:{1},fullname:{2}",k.pid,k.wndhandle,k.fullname);
+                treeView2.Nodes.Add(aaa);
+            }
+
+            
             //获得
             wininfo_group win_info_group = new wininfo_group();
             win_info_group = win_group_list[groupnode.Index];
             foreach (wininfo i in win_info_group.win_info_list)
             {
-
-             
-                // win32api.SetWindowPos(i.wndhandle, -1, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, win32api.SWP_DRAWFRAME|win32api.SWP_NOZORDER| win32api.SWP_ASYNCWINDOWPOS);
-                int aaa = win32api.MoveWindow(i.wndhandle, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, true);
-                if (aaa == 0)
+                //如果有列表中的名字，直接移动窗口,不存在启动进程移动窗口
+                bool movied = false;
+                foreach (wininfo j in path_list)
                 {
-                    Process my = new Process();
-                    my = Process.Start(i.fullname);
-                    win32api.MoveWindow(my.MainWindowHandle, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, true);
-                    Thread.Sleep(100);
-                    
+                    if (j.fullname == i.fullname)
+                    {
+                        //如果存在直接移动窗口
+                        //win32api.MoveWindow(j.wndhandle, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, true);
+                        win32api.SetWindowPos(j.wndhandle, -1, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, win32api.SWP_DRAWFRAME|win32api.SWP_NOZORDER| win32api.SWP_ASYNCWINDOWPOS);
+                        win32api.ShowWindow(j.wndhandle, win32api.SW_SHOWNORMAL);
+                        win32api.UpdateWindow(j.wndhandle);
+
+                        movied = true;
+                        break;
+                    }
+
                 }
-                
+                if (!movied)
+                {
+                    //如果没有，新启动程序，移动窗口。
+                    Process my = new Process();
+                        my = Process.Start(i.fullname);
+                       // win32api.MoveWindow(my.MainWindowHandle, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, true);
+                        win32api.SetWindowPos(my.MainWindowHandle, -1, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, win32api.SWP_DRAWFRAME|win32api.SWP_NOZORDER| win32api.SWP_ASYNCWINDOWPOS);
+                    win32api.ShowWindow(my.MainWindowHandle, win32api.SW_SHOWNORMAL);
+                    win32api.UpdateWindow(my.MainWindowHandle);
+                    Thread.Sleep(100);
+                }
+                //这句也是可以用的。
+                // win32api.SetWindowPos(i.wndhandle, -1, i.rect.Left, i.rect.Top, i.rect.Right - i.rect.Left, i.rect.Bottom - i.rect.Top, win32api.SWP_DRAWFRAME|win32api.SWP_NOZORDER| win32api.SWP_ASYNCWINDOWPOS);
             }
         }
         
@@ -324,6 +369,9 @@ namespace set_win_v1
         {
             //读取窗口分组信息
             road_json_file(Application.StartupPath + "\\info.json");
+            treeView1.HideSelection = false;
+            this.treeView1.DrawMode = TreeViewDrawMode.OwnerDrawText;
+            this.treeView1.DrawNode += new DrawTreeNodeEventHandler(treeView1_DrawNode);
         }
 
         private void road_json_file(string fp)
@@ -453,13 +501,110 @@ namespace set_win_v1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            List<string> path_list = new List<string>();
-            path_list=get_full_path_all();
-            foreach( string i in path_list)
+
+            List<wininfo> path_list = new List<wininfo>();
+            path_list = get_top_win_info_way_2();
+            foreach (wininfo i in path_list)
             {
-                treeView1.Nodes.Add(i);
+                StringBuilder title = new StringBuilder(256);
+                win32api.GetWindowText(i.wndhandle, title, title.Capacity);
+                string ddd = string.Format("pid:{0}-wndle:{1}--{2}", i.pid, i.wndhandle.ToString(), i.fullname);
+                //if (title.Length > 0)
+                    treeView1.Nodes.Add(ddd);
+                
             }
             
+
         }
+
+
+        //获得所有顶级窗口的 进程id，窗口进程，全路径名
+        private List<wininfo> get_top_win_info_way_2() 
+        {
+            List<wininfo> path_list = new List<wininfo>();
+
+            //通过desktop窗口反向找的次级窗口为实际应用窗口的顶级窗口
+            //1、获取桌面窗口的句柄
+            IntPtr desktopPtr = win32api.GetDesktopWindow();
+            textBox1.Text = desktopPtr.ToString();
+            //2、获得一个子窗口（这通常是一个顶层窗口，当前活动的窗口）
+            IntPtr winPtr = win32api.GetWindow(desktopPtr, 5);
+
+            //3、循环取得桌面下的所有子窗口
+            List<IntPtr> winPtr_list = new List<IntPtr>();
+            while (winPtr != IntPtr.Zero)
+            {
+                if (win32api.IsWindowVisible(winPtr) && win32api.IsWindow(winPtr) && win32api.IsWindowEnabled(winPtr))
+                {
+                    
+                    uint num = 0;
+                    win32api.GetWindowThreadProcessId(winPtr, ref num);
+                    string a = string.Format("{0}", get_fullpath(num));
+
+                    bool path_list_have_it = false;
+                    foreach (wininfo j in path_list)
+                    {
+                        if (j.fullname == a)
+                        {
+                            path_list_have_it = true;
+                            break;
+                        }
+
+                    }
+                    path_list_have_it = false;
+                    if (!path_list_have_it )
+                    {
+                        wininfo t = new wininfo();
+                        t.fullname = a;
+                        t.wndhandle = winPtr;
+                        t.pid = (IntPtr)num;
+                        t.rect.Top = 0;
+                        t.rect.Bottom = 0;
+                        t.rect.Left = 0;
+                        t.rect.Right = 0;
+                        path_list.Add(t);
+                    }
+                }
+                //4、继续获取下一个子窗口
+                winPtr = win32api.GetWindow(winPtr, 2);
+            }
+            return path_list;
+        }
+
+        //treeview在绘制节点事件中，按自已想的绘制
+        private void treeView1_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            e.DrawDefault = true; //我这里用默认颜色即可，只需要在TreeView失去焦点时选中节点仍然突显
+            return;
+
+            if ((e.State & TreeNodeStates.Selected) != 0)
+            {
+                //演示为绿底白字
+                e.Graphics.FillRectangle(Brushes.DarkBlue, e.Node.Bounds);
+
+                Font nodeFont = e.Node.NodeFont;
+                if (nodeFont == null) nodeFont = ((TreeView)sender).Font;
+                e.Graphics.DrawString(e.Node.Text, nodeFont, Brushes.White, Rectangle.Inflate(e.Bounds, 2, 0));
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
+
+            if ((e.State & TreeNodeStates.Focused) != 0)
+            {
+                using (Pen focusPen = new Pen(Color.Black))
+                {
+                    focusPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                    Rectangle focusBounds = e.Node.Bounds;
+                    focusBounds.Size = new Size(focusBounds.Width - 1,
+                    focusBounds.Height - 1);
+                    e.Graphics.DrawRectangle(focusPen, focusBounds);
+                }
+            }
+
+        }
+
+
     }
 }

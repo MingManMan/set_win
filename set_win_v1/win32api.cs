@@ -133,10 +133,24 @@ namespace set_win
         public const int SWP_DEFERERASE = 0x2000; //{防止产生 WM_SYNCPAINT 消息}
         public const int SWP_NOSENDCHANGING = 0x400; //{不发出 WM_WINDOWPOSCHANGING 消息 }
 
-    /// <summary>
-    /// 鼠标常量定义
-    /// </summary>
-    public const int WM_MOUSEMOVE = 0x200;
+
+        public const UInt32 SW_HIDE = 0;
+        public const UInt32 SW_SHOWNORMAL = 1;
+        public const UInt32 SW_NORMAL = 1;
+        public const UInt32 SW_SHOWMINIMIZED = 2;
+        public const UInt32 SW_SHOWMAXIMIZED = 3;
+        public const UInt32 SW_MAXIMIZE = 3;
+        public const UInt32 SW_SHOWNOACTIVATE = 4;
+        public const UInt32 SW_SHOW = 5;
+        public const UInt32 SW_MINIMIZE = 6;
+        public const UInt32 SW_SHOWMINNOACTIVE = 7;
+        public const UInt32 SW_SHOWNA = 8;
+        public const UInt32 SW_RESTORE = 9;
+
+        /// <summary>
+        /// 鼠标常量定义
+        /// </summary>
+        public const int WM_MOUSEMOVE = 0x200;
         public const int WM_LBUTTONDOWN = 0x201;
         public const int WM_RBUTTONDOWN = 0x204;
         public const int WM_MBUTTONDOWN = 0x207;
@@ -255,7 +269,7 @@ namespace set_win
         // GW_HWNDLAST  1   为一个源子窗口寻找最后一个兄弟（同级）窗口，或寻找最后一个顶级窗口
         //GW_HWNDNEXT   2   为源窗口寻找下一个兄弟窗口
         //GW_HWNDPREV  3 为源窗口寻找前一个兄弟窗口
-        //   GW_OWNER  4    寻找窗口的所有者
+        //GW_OWNER  4    寻找窗口的所有者
 
         // 装置钩子的函数
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
@@ -272,6 +286,10 @@ namespace set_win
         //指定坐标处窗体句柄  
         [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr WindowFromPoint(Point point);
+
+        [DllImport("user32", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern IntPtr GetDesktopWindow();
+
 
         //获取鼠标坐标  
         [DllImport("user32.dll", EntryPoint = "GetCursorPos", SetLastError = true, CharSet = CharSet.Auto)]
@@ -296,6 +314,8 @@ namespace set_win
         [DllImport("User32.DLL", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern IntPtr LoadCursorFromFile(string fileName);
 
+        [DllImport("User32.DLL", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern bool UpdateWindow(IntPtr hWnd);
 
     }
 }
